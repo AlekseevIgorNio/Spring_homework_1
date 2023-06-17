@@ -28,10 +28,10 @@
             border-bottom: 1px solid #ddd;
         }
 
-        .invalid-id{
+        .invalid-p {
             width: auto;
             padding-left: 25px;
-            font-size: x-large;
+            font-size: large;
             color: red;
         }
     </style>
@@ -53,20 +53,28 @@
                 <td>
                     <input type="submit" value="save">
                 </td>
+                <td th:if="${#fields.hasErrors()}">
+                    <p class="invalid-p">Error, fields are filled in incorrectly, please try again</p>
+                </td>
             </tr>
         </table>
     </form>
 
-    <form method="post" th:action="@{/books/remove}">
+    <form method="post" th:action="@{/books/remove}" th:object="${bookIdRemove}">
         <table>
             <tr>
                 <td>
-                    <input type="text" placeholder="id number" th:name="bookIdToRemove">
+                    <input type="text" placeholder="id number" th:field="*{id}">
                 </td>
                 <td>
                     <input type="submit" value="remove">
                 </td>
-                <br>
+                <td th:if="${#fields.hasErrors()}">
+                    <p class="invalid-p">Error, id must not be empty, please try again</p>
+                </td>
+                <td th:if="${notBookWithId}">
+                    <p class="invalid-p">Error, there is no book with this id, please try again</p>
+                </td>
             </tr>
         </table>
     </form>
@@ -80,11 +88,28 @@
                 <td>
                     <input type="submit" value="remove by regex">
                 </td>
+                <td th:if="${invalidId}">
+                    <p class="invalid-p">Error, your request does not match any books, please try again</p>
+                </td>
             </tr>
         </table>
     </form>
 
-    <p class="invalid-id" th:text="${invalidId}"></p>
+    <form method="post" th:action="@{/books/uploadFile}" enctype="multipart/form-data">
+        <table>
+            <tr>
+                <td>
+                    <input type="file" name="file"/>
+                </td>
+                <td>
+                    <input type="submit" value="Upload"/>
+                </td>
+                <td>
+                    <p class="invalid-p" th:if="${invalidFile}">Error, you have not selected a file, please try again<p/>
+                </td>
+            </tr>
+        </table>
+    </form>
 
     <table id="books">
         <tr>

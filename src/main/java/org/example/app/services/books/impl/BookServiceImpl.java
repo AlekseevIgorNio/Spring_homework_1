@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.example.app.services.books.BookService;
-import org.example.app.services.books.BooksRepository;
+import org.example.app.services.books.BooksDao;
 import org.example.web.dto.Book;
 import org.springframework.stereotype.Service;
 
@@ -14,11 +14,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
 
-    private final BooksRepository<Book> bookRepo;
+    private final BooksDao<Book> bookRepo;
     private Logger logger = Logger.getLogger(BookServiceImpl.class);
 
     public List<Book> getAllBooks() {
-        return bookRepo.retreiveAll();
+        return bookRepo.getAll();
     }
 
     public void saveBook(Book book) {
@@ -36,7 +36,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public boolean removeByRegex(String queryRegexRemove) {
-        List<Book> allBooks = bookRepo.retreiveAll();
+        List<Book> allBooks = bookRepo.getAll();
 
         int original = allBooks.size();
 
@@ -48,7 +48,7 @@ public class BookServiceImpl implements BookService {
             }
         });
 
-        int end = bookRepo.retreiveAll().size() - original;
+        int end = bookRepo.getAll().size() - original;
 
         if (end != 0) {
             logger.info("Remotely using a regular expression of " + end + "books, successfully");
