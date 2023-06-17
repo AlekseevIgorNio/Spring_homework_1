@@ -37,18 +37,4 @@ public class BookRepositoryImpl implements BooksRepository<Book> {
         }
         return false;
     }
-
-    @Override
-    public boolean removeByRegex(String queryRegexRemove) {
-//        int original = repo.size();
-//        retreiveAll().forEach(book -> {
-//            if (StringUtils.equalsIgnoreCase(book.getAuthor(), queryRegexRemove)
-//                    || StringUtils.equalsIgnoreCase(book.getTitle(), queryRegexRemove)
-//                    || ) {
-//
-//            }
-//        });
-
-        return false;
-    }
 }

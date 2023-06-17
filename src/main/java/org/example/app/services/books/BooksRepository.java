@@ -8,6 +8,4 @@ public interface BooksRepository<T> {
     void store(T book);
 
     boolean removeItemById(Integer bookIdToRemove);
-
-    boolean removeByRegex(String queryRegexRemove);
 }
