@@ -2,6 +2,7 @@ package org.example.web.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.example.app.services.books.BookService;
 import org.example.web.dto.Book;
@@ -24,12 +25,16 @@ import java.io.FileOutputStream;
 @RequestMapping(value = "/books")
 public class BookShelfController {
 
+    public static final String MAIN_BOOK_PAGE = "/books/shelf";
     private final Logger logger = Logger.getLogger(BookShelfController.class);
     private final BookService bookService;
 
     @GetMapping("/shelf")
-    public String books(Model model) {
+    public String books(@RequestParam(required = false) String error, Model model) {
         logger.info("got book shelf");
+        if (StringUtils.isNotEmpty(error)) {
+            model.addAttribute(error, true);
+        }
         getBooksForView(model);
         return "book_shelf";
     }
@@ -56,32 +61,26 @@ public class BookShelfController {
         if (bookService.removeBookById(bookIdRemove.getId())) {
             return "redirect:/books/shelf";
         } else {
-            model.addAttribute("notBookWithId", true);
-            getBooksForView(model);
             logger.warn("Book with this id not exists");
-            return "book_shelf";
+            return getMainPageWithError("notBookWithId");
         }
     }
 
     @PostMapping("/removeByRegex")
-    public String removeByRegex(@RequestParam(value = "queryRegex") String queryRegexRemove, Model model) {
+    public String removeByRegex(@RequestParam(value = "queryRegex") String queryRegexRemove) {
         if (bookService.removeByRegex(queryRegexRemove)) {
             return "redirect:/books/shelf";
         } else {
-            model.addAttribute("invalidId", true);
-            getBooksForView(model);
             logger.warn("Regex for delete book is un correct, or empty");
-            return "book_shelf";
+            return getMainPageWithError("invalidId");
         }
     }
 
     @PostMapping("/uploadFile")
-    public String uploadFile(@RequestParam("file") MultipartFile file, Model model) throws Exception {
+    public String uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
         if (file.isEmpty()) {
-            model.addAttribute("invalidFile", true);
-            getBooksForView(model);
             logger.warn("File not exists, or is bad");
-            return "book_shelf";
+            return getMainPageWithError("invalidFile");
         }
         String fileName = file.getOriginalFilename();
         byte[] bytes = file.getBytes();
@@ -98,6 +97,10 @@ public class BookShelfController {
         bos.close();
 
         return "redirect:/books/shelf";
+    }
+
+    private String getMainPageWithError(String error) {
+        return "redirect:" + MAIN_BOOK_PAGE + "?error=" + error;
     }
 
     private void getBooksForView(Model model) {
